@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>本当のNEXTAGE祭2026 曲紹介リスト（非公式）</title>
+
+  <style>
+    /* =========================================================
+       カラー設定
+       ========================================================= */
+
+    :root {
+      color-scheme: dark;
+
+      --bg: #09090b;
+      --card: #141417;
+      --card-hover: #18181c;
+      --control: #111114;
+
+      --border: #2b2b31;
+      --border-light: #383840;
+
+      --text: #f2f2f3;
+      --text-sub: #b1b1b8;
+      --text-muted: #7f7f89;
+
+      --button: #f0f0f2;
+      --button-text: #111114;
+
+      --button-secondary: #242429;
+      --button-secondary-hover: #303037;
+
+      --focus: #8f8fff;
+
+      --radius: 12px;
+    }
+
+    /* =========================================================
+       基本設定
+       ========================================================= */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+
+      background:
+        radial-gradient(
+          circle at top,
+          #16161c 0,
+          #0b0b0e 420px,
+          var(--bg) 800px
+        );
+
+      background-attachment: fixed;
+
+      color: var(--text);
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Hiragino Kaku Gothic ProN",
+        "Hiragino Sans",
+        "Noto Sans JP",
+        "Yu Gothic",
+        sans-serif;
+
+      line-height: 1.6;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    /* =========================================================
+       ページ全体
+       ========================================================= */
+
+    .container {
+      width: min(1440px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 42px 0 72px;
+    }
+
+    .page-header {
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0;
+
+      font-size: clamp(28px, 3vw, 42px);
+      line-height: 1.25;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+
+      color: var(--text-sub);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .author-link {
+      display: inline-block;
+      margin-top: 3px;
+
+      color: #aaaaff;
+
+      text-decoration: none;
+
+      transition: color 0.15s;
+    }
+
+    .author-link:hover {
+      color: #d0d0ff;
+      text-decoration: underline;
+    }
+
+    /* =========================================================
+       検索・フィルター・並び替え
+       ========================================================= */
+
+    .controls {
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        240px
+        auto
+        auto;
+
+      gap: 12px;
+
+      margin-bottom: 10px;
+    }
+
+    .controls input,
+    .controls select {
+      width: 100%;
+      height: 48px;
+
+      padding: 0 15px;
+
+      border: 1px solid var(--border);
+      border-radius: 9px;
+
+      outline: none;
+
+      background: var(--control);
+      color: var(--text);
+
+      transition:
+        border-color 0.15s,
+        box-shadow 0.15s,
+        background 0.15s;
+    }
+
+    .controls input::placeholder {
+      color: #707078;
+    }
+
+    .controls input:hover,
+    .controls select:hover {
+      border-color: var(--border-light);
+      background: #141418;
+    }
+
+    .controls input:focus,
+    .controls select:focus {
+      border-color: var(--focus);
+
+      box-shadow:
+        0 0 0 2px
+        rgba(143, 143, 255, 0.13);
+    }
+
+    /* =========================================================
+       並び替えボタン
+       ========================================================= */
+
+    .order-button {
+      height: 48px;
+
+      padding: 0 17px;
+
+      border: 1px solid var(--border-light);
+      border-radius: 9px;
+
+      background: var(--button-secondary);
+      color: var(--text);
+
+      cursor: pointer;
+
+      font-size: 14px;
+      font-weight: 700;
+
+      white-space: nowrap;
+
+      transition:
+        background 0.15s,
+        border-color 0.15s,
+        color 0.15s,
+        opacity 0.15s,
+        transform 0.1s;
+    }
+
+    .order-button:hover:not(:disabled) {
+      background: var(--button-secondary-hover);
+      border-color: #55555f;
+    }
+
+    .order-button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .order-button:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .order-button:disabled {
+      cursor: default;
+      opacity: 0.38;
+    }
+
+    .result-count {
+      min-height: 22px;
+
+      margin: 0 0 18px;
+
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* =========================================================
+       作品一覧
+       ========================================================= */
+
+    .song-list {
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
+
+      align-items: start;
+
+      gap: 16px;
+    }
+
+    /* =========================================================
+       カード
+       ========================================================= */
+
+    .song-card {
+      display: grid;
+
+      grid-template-columns:
+        225px
+        minmax(0, 1fr);
+
+      gap: 18px;
+
+      height: 264px;
+
+      padding: 15px;
+
+      overflow: hidden;
+
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.025),
+          transparent 35%
+        ),
+        var(--card);
+
+      box-shadow:
+        0 8px 28px
+        rgba(0, 0, 0, 0.16);
+
+      transition:
+        border-color 0.15s,
+        background 0.15s;
+    }
+
+    .song-card:hover {
+      border-color: var(--border-light);
+      background-color: var(--card-hover);
+    }
+
+    .song-card.is-expanded {
+      height: auto;
+      min-height: 264px;
+
+      overflow: visible;
+    }
+
+    /* =========================================================
+       左カラム
+       ========================================================= */
+
+    .media-column {
+      display: flex;
+
+      min-width: 0;
+
+      flex-direction: column;
+
+      gap: 10px;
+    }
+
+    /* =========================================================
+       ニコニコ動画埋め込み
+       ========================================================= */
+
+    .video-wrapper {
+      position: relative;
+
+      width: 100%;
+      aspect-ratio: 16 / 9;
+
+      flex: 0 0 auto;
+
+      overflow: hidden;
+
+      border: 1px solid #29292f;
+      border-radius: 8px;
+
+      background: #050506;
+    }
+
+    .video-wrapper iframe {
+      display: block;
+
+      width: 100%;
+      height: 100%;
+
+      border: 0;
+    }
+
+    .video-placeholder {
+      display: flex;
+
+      width: 100%;
+      height: 100%;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 12px;
+
+      color: var(--text-muted);
+
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* =========================================================
+       サムネイル下ボタン
+       ========================================================= */
+
+    .links {
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+      gap: 8px;
+    }
+
+    .button {
+      display: inline-flex;
+
+      height: 38px;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 0 13px;
+
+      border: 1px solid transparent;
+      border-radius: 7px;
+
+      text-decoration: none;
+
+      font-size: 13px;
+      font-weight: 700;
+
+      transition:
+        background 0.15s,
+        color 0.15s,
+        border-color 0.15s,
+        transform 0.1s;
+    }
+
+    .button-work {
+      background: var(--button);
+      color: var(--button-text);
+    }
+
+    .button-work:hover {
+      background: #ffffff;
+    }
+
+    .button-x {
+      min-width: 42px;
+
+      border-color: var(--border-light);
+
+      background: var(--button-secondary);
+      color: var(--text);
+    }
+
+    .button-x:hover {
+      background: var(--button-secondary-hover);
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    /* =========================================================
+       右カラム
+       ========================================================= */
+
+    .song-content {
+      display: flex;
+
+      min-width: 0;
+      min-height: 0;
+
+      flex-direction: column;
+    }
+
+    .song-title {
+      margin: 0;
+
+      color: var(--text);
+
+      font-size: 19px;
+      line-height: 1.4;
+      font-weight: 750;
+
+      overflow-wrap: anywhere;
+    }
+
+    .author {
+      margin: 4px 0 0;
+
+      color: var(--text-sub);
+
+      font-size: 13px;
+      line-height: 1.5;
+
+      overflow-wrap: anywhere;
+    }
+
+    .meta {
+      margin-top: 9px;
+
+      color: #9898a1;
+
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .meta-label {
+      color: #6f6f78;
+    }
+
+    /* =========================================================
+       説明文
+       ========================================================= */
+
+    .description-block {
+      min-height: 0;
+      margin-top: 13px;
+    }
+
+    .description {
+      margin: 0;
+
+      color: #d2d2d7;
+
+      font-size: 13px;
+      line-height: 1.7;
+
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+
+      display: -webkit-box;
+
+      overflow: hidden;
+
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 4;
+
+      line-clamp: 4;
+    }
+
+    .description.is-expanded {
+      display: block;
+
+      overflow: visible;
+
+      -webkit-line-clamp: unset;
+      line-clamp: unset;
+    }
+
+    .description-toggle {
+      margin-top: 6px;
+
+      padding: 0;
+
+      border: 0;
+
+      background: transparent;
+      color: #aaaaff;
+
+      cursor: pointer;
+
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .description-toggle:hover {
+      color: #ccccff;
+      text-decoration: underline;
+    }
+
+    .description-toggle[hidden] {
+      display: none;
+    }
+
+    /* =========================================================
+       メッセージ
+       ========================================================= */
+
+    .message {
+      grid-column: 1 / -1;
+
+      padding: 36px;
+
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+
+      background: var(--card);
+
+      color: var(--text-muted);
+
+      text-align: center;
+    }
+
+    .message.error {
+      color: #ff9696;
+    }
+
+    /* =========================================================
+       タブレット
+       ========================================================= */
+
+    @media (max-width: 1200px) {
+      .controls {
+        grid-template-columns:
+          minmax(0, 1fr)
+          220px
+          auto
+          auto;
+      }
+
+      .song-list {
+        grid-template-columns: 1fr;
+      }
+
+      .song-card {
+        grid-template-columns:
+          245px
+          minmax(0, 1fr);
+
+        height: 260px;
+      }
+
+      .song-card.is-expanded {
+        min-height: 260px;
+      }
+    }
+
+    /* =========================================================
+       検索UIを2段にする
+       ========================================================= */
+
+    @media (max-width: 850px) {
+      .controls {
+        grid-template-columns:
+          minmax(0, 1fr)
+          minmax(180px, 240px);
+
+        grid-template-areas:
+          "search vocal"
+          "shuffle reset";
+      }
+
+      #search {
+        grid-area: search;
+      }
+
+      #vocal-filter {
+        grid-area: vocal;
+      }
+
+      #shuffle-button {
+        grid-area: shuffle;
+      }
+
+      #reset-order-button {
+        grid-area: reset;
+      }
+    }
+
+    /* =========================================================
+       スマートフォン
+       ========================================================= */
+
+    @media (max-width: 700px) {
+      .container {
+        width: min(
+          100% - 24px,
+          1440px
+        );
+
+        padding-top: 26px;
+      }
+
+      .page-header {
+        margin-bottom: 22px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+
+        grid-template-areas:
+          "search"
+          "vocal"
+          "shuffle"
+          "reset";
+      }
+
+      .order-button {
+        width: 100%;
+      }
+
+      .song-list {
+        gap: 12px;
+      }
+
+      .song-card,
+      .song-card.is-expanded {
+        display: block;
+
+        height: auto;
+        min-height: 0;
+
+        padding: 13px;
+      }
+
+      .media-column {
+        margin-bottom: 15px;
+      }
+
+      .song-title {
+        font-size: 18px;
+      }
+
+      .description {
+        -webkit-line-clamp: 5;
+        line-clamp: 5;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <header class="page-header">
+      <h1>
+        本当のNEXTAGE祭2026 曲紹介リスト
+      </h1>
+
+      <p class="subtitle">
+        本当のNEXTAGE祭2026の曲紹介リストの非公式Viewerです。
+        <br />
+
+        <a
+          class="author-link"
+          href="https://x.com/GAKKI_D_Neb"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          作者X：@GAKKI_D_Neb
+        </a>
+      </p>
+    </header>
+
+    <div class="controls">
+      <input
+        id="search"
+        type="search"
+        placeholder="曲名・投稿者名を検索"
+        aria-label="曲名・投稿者名を検索"
+      />
+
+      <select
+        id="vocal-filter"
+        aria-label="使用ボカロで絞り込み"
+      >
+        <option value="">
+          すべてのボカロ
+        </option>
+      </select>
+
+      <button
+        id="shuffle-button"
+        class="order-button"
+        type="button"
+      >
+        ↻ ランダム
+      </button>
+
+      <button
+        id="reset-order-button"
+        class="order-button"
+        type="button"
+        disabled
+      >
+        元の順番に戻す
+      </button>
+    </div>
+
+    <p
+      id="result-count"
+      class="result-count"
+    ></p>
+
+    <div
+      id="song-list"
+      class="song-list"
+    >
+      <div class="message">
+        読み込み中です……
+      </div>
+    </div>
+  </main>
+
+  <script>
+    /* =========================================================
+       ★ スプレッドシート設定
+       ========================================================= */
+
+    const SPREADSHEET_ID =
+      "1XEMDEkOmU0pOTdk9G_QuSbWjpPnpVZoHIJgPeMWzvTk";
+
+    const SHEET_NAME =
+      "閲覧用";
+
+    /* =========================================================
+       スプレッドシート列名
+       ========================================================= */
+
+    const COLUMNS = {
+      title:
+        "曲名（フリガナ）",
+
+      author:
+        "投稿者名（フリガナ）",
+
+      vocal:
+        "使用ボカロ",
+
+      description:
+        "どんな曲ですか。作品PR、思い入れや背景等ご自由に",
+
+      xUrl:
+        "Xアカウントリンク",
+
+      workUrl:
+        "作品リンク",
+    };
+
+    /* =========================================================
+       OpenSheet
+       ========================================================= */
+
+    const SHEET_URL =
+      `https://opensheet.elk.sh/` +
+      `${SPREADSHEET_ID}/` +
+      `${encodeURIComponent(SHEET_NAME)}`;
+
+    /*
+     * originalSongs:
+     * スプレッドシートから取得した元の順番。
+     *
+     * songs:
+     * 実際に画面表示に使用する順番。
+     */
+    let originalSongs = [];
+    let songs = [];
+
+    let isShuffled = false;
+
+    /* =========================================================
+       文字列正規化
+       ========================================================= */
+
+    function normalizeText(value) {
+      return String(value ?? "")
+        .normalize("NFKC")
+        .toLocaleLowerCase("ja")
+        .trim();
+    }
+
+    /* =========================================================
+       ニコニコ動画ID
+       ========================================================= */
+
+    function getNiconicoVideoId(
+      videoUrl
+    ) {
+      if (!videoUrl) {
+        return null;
+      }
+
+      const match =
+        String(videoUrl).match(
+          /(?:nicovideo\.jp\/watch\/|nico\.ms\/)((?:sm|so|nm)\d+)/i
+        );
+
+      return match
+        ? match[1].toLowerCase()
+        : null;
+    }
+
+    /* =========================================================
+       ニコニコ埋め込みURL
+       ========================================================= */
+
+    function getNiconicoEmbedUrl(
+      videoUrl
+    ) {
+      const videoId =
+        getNiconicoVideoId(
+          videoUrl
+        );
+
+      if (!videoId) {
+        return null;
+      }
+
+      return (
+        "https://embed.nicovideo.jp/watch/" +
+        encodeURIComponent(videoId)
+      );
+    }
+
+    /* =========================================================
+       使用ボカロ
+       ========================================================= */
+
+    function splitVocals(value) {
+      if (!value) {
+        return [];
+      }
+
+      return String(value)
+        .split(
+          /[、,，／/\n＆&]+/
+        )
+        .map(
+          (item) =>
+            item.trim()
+        )
+        .filter(Boolean);
+    }
+
+    /* =========================================================
+       ボカロ選択肢
+       ========================================================= */
+
+    function createVocalFilter() {
+      const select =
+        document.getElementById(
+          "vocal-filter"
+        );
+
+      select.replaceChildren();
+
+      const allOption =
+        document.createElement(
+          "option"
+        );
+
+      allOption.value = "";
+
+      allOption.textContent =
+        "すべてのボカロ";
+
+      select.appendChild(
+        allOption
+      );
+
+      const vocals = [
+        ...new Set(
+          originalSongs.flatMap(
+            (song) =>
+              splitVocals(
+                song[
+                  COLUMNS.vocal
+                ]
+              )
+          )
+        ),
+      ].sort(
+        (a, b) =>
+          a.localeCompare(
+            b,
+            "ja"
+          )
+      );
+
+      for (
+        const vocal of vocals
+      ) {
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          vocal;
+
+        option.textContent =
+          vocal;
+
+        select.appendChild(
+          option
+        );
+      }
+    }
+
+    /* =========================================================
+       ニコニコ埋め込み
+       ========================================================= */
+
+    function createVideoEmbed(song) {
+      const wrapper =
+        document.createElement(
+          "div"
+        );
+
+      wrapper.className =
+        "video-wrapper";
+
+      const embedUrl =
+        getNiconicoEmbedUrl(
+          song[
+            COLUMNS.workUrl
+          ]
+        );
+
+      if (!embedUrl) {
+        const placeholder =
+          document.createElement(
+            "div"
+          );
+
+        placeholder.className =
+          "video-placeholder";
+
+        placeholder.textContent =
+          "動画を取得できませんでした";
+
+        wrapper.appendChild(
+          placeholder
+        );
+
+        return wrapper;
+      }
+
+      const iframe =
+        document.createElement(
+          "iframe"
+        );
+
+      iframe.src =
+        embedUrl;
+
+      iframe.title =
+        song[COLUMNS.title]
+          ? `${song[COLUMNS.title]} のニコニコ動画`
+          : "ニコニコ動画";
+
+      iframe.loading =
+        "lazy";
+
+      iframe.allowFullscreen =
+        true;
+
+      iframe.allow =
+        "autoplay; fullscreen; picture-in-picture";
+
+      iframe.referrerPolicy =
+        "strict-origin-when-cross-origin";
+
+      wrapper.appendChild(
+        iframe
+      );
+
+      return wrapper;
+    }
+
+    /* =========================================================
+       リンクボタン
+       ========================================================= */
+
+    function createLinkButton(
+      text,
+      url,
+      type
+    ) {
+      if (!url) {
+        return null;
+      }
+
+      const link =
+        document.createElement(
+          "a"
+        );
+
+      link.className =
+        `button ${type}`;
+
+      link.href =
+        url;
+
+      link.target =
+        "_blank";
+
+      link.rel =
+        "noopener noreferrer";
+
+      link.textContent =
+        text;
+
+      return link;
+    }
+
+    /* =========================================================
+       作品カード
+       ========================================================= */
+
+    function createSongCard(
+      song,
+      index
+    ) {
+      const card =
+        document.createElement(
+          "article"
+        );
+
+      card.className =
+        "song-card";
+
+      /*
+       * 左カラム
+       */
+      const mediaColumn =
+        document.createElement(
+          "div"
+        );
+
+      mediaColumn.className =
+        "media-column";
+
+      mediaColumn.appendChild(
+        createVideoEmbed(
+          song
+        )
+      );
+
+      /*
+       * 作品/Xリンク
+       */
+      const links =
+        document.createElement(
+          "div"
+        );
+
+      links.className =
+        "links";
+
+      const workLink =
+        createLinkButton(
+          "作品を見る",
+          song[
+            COLUMNS.workUrl
+          ],
+          "button-work"
+        );
+
+      const xLink =
+        createLinkButton(
+          "X",
+          song[
+            COLUMNS.xUrl
+          ],
+          "button-x"
+        );
+
+      if (workLink) {
+        links.appendChild(
+          workLink
+        );
+      }
+
+      if (xLink) {
+        links.appendChild(
+          xLink
+        );
+      }
+
+      if (
+        links.children.length >
+        0
+      ) {
+        mediaColumn.appendChild(
+          links
+        );
+      }
+
+      card.appendChild(
+        mediaColumn
+      );
+
+      /*
+       * 右カラム
+       */
+      const content =
+        document.createElement(
+          "div"
+        );
+
+      content.className =
+        "song-content";
+
+      /*
+       * 曲名
+       */
+      const title =
+        document.createElement(
+          "h2"
+        );
+
+      title.className =
+        "song-title";
+
+      title.textContent =
+        song[COLUMNS.title] ||
+        "曲名未設定";
+
+      content.appendChild(
+        title
+      );
+
+      /*
+       * 投稿者
+       */
+      if (
+        song[
+          COLUMNS.author
+        ]
+      ) {
+        const author =
+          document.createElement(
+            "p"
+          );
+
+        author.className =
+          "author";
+
+        author.textContent =
+          song[
+            COLUMNS.author
+          ];
+
+        content.appendChild(
+          author
+        );
+      }
+
+      /*
+       * 使用ボカロ
+       */
+      if (
+        song[
+          COLUMNS.vocal
+        ]
+      ) {
+        const meta =
+          document.createElement(
+            "div"
+          );
+
+        meta.className =
+          "meta";
+
+        const label =
+          document.createElement(
+            "span"
+          );
+
+        label.className =
+          "meta-label";
+
+        label.textContent =
+          "使用ボカロ：";
+
+        meta.appendChild(
+          label
+        );
+
+        meta.appendChild(
+          document.createTextNode(
+            song[
+              COLUMNS.vocal
+            ]
+          )
+        );
+
+        content.appendChild(
+          meta
+        );
+      }
+
+      /*
+       * 説明文
+       */
+      if (
+        song[
+          COLUMNS.description
+        ]
+      ) {
+        const block =
+          document.createElement(
+            "div"
+          );
+
+        block.className =
+          "description-block";
+
+        const description =
+          document.createElement(
+            "p"
+          );
+
+        description.className =
+          "description";
+
+        description.id =
+          `description-${index}`;
+
+        description.textContent =
+          song[
+            COLUMNS.description
+          ];
+
+        const toggle =
+          document.createElement(
+            "button"
+          );
+
+        toggle.type =
+          "button";
+
+        toggle.className =
+          "description-toggle";
+
+        toggle.textContent =
+          "続きを読む";
+
+        toggle.hidden =
+          true;
+
+        toggle.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+
+        toggle.setAttribute(
+          "aria-controls",
+          description.id
+        );
+
+        toggle.addEventListener(
+          "click",
+          () => {
+            const expanded =
+              description
+                .classList
+                .toggle(
+                  "is-expanded"
+                );
+
+            card
+              .classList
+              .toggle(
+                "is-expanded",
+                expanded
+              );
+
+            toggle.textContent =
+              expanded
+                ? "閉じる"
+                : "続きを読む";
+
+            toggle.setAttribute(
+              "aria-expanded",
+              String(expanded)
+            );
+          }
+        );
+
+        block.appendChild(
+          description
+        );
+
+        block.appendChild(
+          toggle
+        );
+
+        content.appendChild(
+          block
+        );
+      }
+
+      card.appendChild(
+        content
+      );
+
+      return card;
+    }
+
+    /* =========================================================
+       説明文が省略されているかチェック
+       ========================================================= */
+
+    function updateDescriptionToggles() {
+      const blocks =
+        document.querySelectorAll(
+          ".description-block"
+        );
+
+      for (
+        const block of blocks
+      ) {
+        const description =
+          block.querySelector(
+            ".description"
+          );
+
+        const toggle =
+          block.querySelector(
+            ".description-toggle"
+          );
+
+        if (
+          !description ||
+          !toggle
+        ) {
+          continue;
+        }
+
+        if (
+          description
+            .classList
+            .contains(
+              "is-expanded"
+            )
+        ) {
+          toggle.hidden =
+            false;
+
+          continue;
+        }
+
+        const isOverflowing =
+          description.scrollHeight >
+          description.clientHeight +
+            1;
+
+        toggle.hidden =
+          !isOverflowing;
+      }
+    }
+
+    /* =========================================================
+       一覧描画
+       ========================================================= */
+
+    function renderSongs(data) {
+      const list =
+        document.getElementById(
+          "song-list"
+        );
+
+      const resultCount =
+        document.getElementById(
+          "result-count"
+        );
+
+      list.replaceChildren();
+
+      resultCount.textContent =
+        `${data.length}作品`;
+
+      if (
+        data.length === 0
+      ) {
+        const message =
+          document.createElement(
+            "div"
+          );
+
+        message.className =
+          "message";
+
+        message.textContent =
+          "条件に一致する作品がありません。";
+
+        list.appendChild(
+          message
+        );
+
+        return;
+      }
+
+      const fragment =
+        document.createDocumentFragment();
+
+      data.forEach(
+        (song, index) => {
+          fragment.appendChild(
+            createSongCard(
+              song,
+              index
+            )
+          );
+        }
+      );
+
+      list.appendChild(
+        fragment
+      );
+
+      requestAnimationFrame(
+        updateDescriptionToggles
+      );
+    }
+
+    /* =========================================================
+       ランダム並び替え
+       ========================================================= */
+
+    function shuffleSongs() {
+      /*
+       * Fisher-Yates shuffle
+       */
+      for (
+        let i = songs.length - 1;
+        i > 0;
+        i--
+      ) {
+        const j =
+          Math.floor(
+            Math.random() *
+            (i + 1)
+          );
+
+        [
+          songs[i],
+          songs[j],
+        ] = [
+          songs[j],
+          songs[i],
+        ];
+      }
+
+      isShuffled =
+        true;
+
+      updateOrderButtons();
+
+      /*
+       * 現在の検索・絞り込み条件を維持
+       */
+      applyFilters();
+    }
+
+    /* =========================================================
+       元の順番へ戻す
+       ========================================================= */
+
+    function resetSongOrder() {
+      /*
+       * originalSongsは変更せず保持しているため、
+       * スプレッドシートから取得した時点の順番を
+       * そのまま復元できます。
+       */
+      songs = [
+        ...originalSongs
+      ];
+
+      isShuffled =
+        false;
+
+      updateOrderButtons();
+
+      /*
+       * 検索・ボカロ絞り込み条件はそのまま
+       */
+      applyFilters();
+    }
+
+    /* =========================================================
+       並び替えボタン状態
+       ========================================================= */
+
+    function updateOrderButtons() {
+      const resetButton =
+        document.getElementById(
+          "reset-order-button"
+        );
+
+      resetButton.disabled =
+        !isShuffled;
+    }
+
+    /* =========================================================
+       検索・絞り込み
+       ========================================================= */
+
+    function applyFilters() {
+      const keyword =
+        normalizeText(
+          document
+            .getElementById(
+              "search"
+            )
+            .value
+        );
+
+      const selectedVocal =
+        document.getElementById(
+          "vocal-filter"
+        ).value;
+
+      const filtered =
+        songs.filter(
+          (song) => {
+            const title =
+              normalizeText(
+                song[
+                  COLUMNS.title
+                ]
+              );
+
+            const author =
+              normalizeText(
+                song[
+                  COLUMNS.author
+                ]
+              );
+
+            const vocals =
+              splitVocals(
+                song[
+                  COLUMNS.vocal
+                ]
+              );
+
+            const matchesKeyword =
+              !keyword ||
+              title.includes(
+                keyword
+              ) ||
+              author.includes(
+                keyword
+              );
+
+            const matchesVocal =
+              !selectedVocal ||
+              vocals.includes(
+                selectedVocal
+              );
+
+            return (
+              matchesKeyword &&
+              matchesVocal
+            );
+          }
+        );
+
+      renderSongs(
+        filtered
+      );
+    }
+
+    /* =========================================================
+       スプレッドシート読み込み
+       ========================================================= */
+
+    async function loadSongs() {
+      const list =
+        document.getElementById(
+          "song-list"
+        );
+
+      try {
+        const response =
+          await fetch(
+            SHEET_URL
+          );
+
+        if (
+          !response.ok
+        ) {
+          throw new Error(
+            `OpenSheet HTTP ${response.status}`
+          );
+        }
+
+        const data =
+          await response.json();
+
+        if (
+          !Array.isArray(data)
+        ) {
+          throw new Error(
+            "Invalid spreadsheet data"
+          );
+        }
+
+        /*
+         * 空行を除外
+         */
+        originalSongs =
+          data.filter(
+            (song) =>
+              song[
+                COLUMNS.title
+              ] ||
+              song[
+                COLUMNS.author
+              ] ||
+              song[
+                COLUMNS.workUrl
+              ]
+          );
+
+        /*
+         * 表示用配列は別配列として保持。
+         * これによりランダム化しても
+         * originalSongsは変わらない。
+         */
+        songs = [
+          ...originalSongs
+        ];
+
+        isShuffled =
+          false;
+
+        createVocalFilter();
+
+        updateOrderButtons();
+
+        renderSongs(
+          songs
+        );
+      } catch (
+        error
+      ) {
+        console.error(
+          "スプレッドシートの読み込みに失敗しました。",
+          error
+        );
+
+        list.replaceChildren();
+
+        const message =
+          document.createElement(
+            "div"
+          );
+
+        message.className =
+          "message error";
+
+        message.textContent =
+          "作品一覧を読み込めませんでした。";
+
+        list.appendChild(
+          message
+        );
+
+        document.getElementById(
+          "result-count"
+        ).textContent =
+          "";
+      }
+    }
+
+    /* =========================================================
+       イベント
+       ========================================================= */
+
+    document
+      .getElementById(
+        "search"
+      )
+      .addEventListener(
+        "input",
+        applyFilters
+      );
+
+    document
+      .getElementById(
+        "vocal-filter"
+      )
+      .addEventListener(
+        "change",
+        applyFilters
+      );
+
+    document
+      .getElementById(
+        "shuffle-button"
+      )
+      .addEventListener(
+        "click",
+        shuffleSongs
+      );
+
+    document
+      .getElementById(
+        "reset-order-button"
+      )
+      .addEventListener(
+        "click",
+        resetSongOrder
+      );
+
+    /*
+     * 画面サイズ変更時に
+     * 「続きを読む」を再判定
+     */
+    let resizeTimer;
+
+    window.addEventListener(
+      "resize",
+      () => {
+        clearTimeout(
+          resizeTimer
+        );
+
+        resizeTimer =
+          setTimeout(
+            updateDescriptionToggles,
+            120
+          );
+      }
+    );
+
+    /* =========================================================
+       初期読み込み
+       ========================================================= */
+
+    loadSongs();
+  </script>
+</body>
+</html>
