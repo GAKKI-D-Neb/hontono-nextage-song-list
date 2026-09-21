@@ -886,22 +886,90 @@
     }
 
     /* =========================================================
-       使用ボカロ
-       ========================================================= */
+      使用ボカロ
+      ========================================================= */
 
     function splitVocals(value) {
       if (!value) {
         return [];
       }
 
-      return String(value)
+      let text =
+        String(value);
+
+      /*
+      * まず括弧内の補足を削除する。
+      *
+      * 例:
+      * 重音テト（SynthesizerV） & 初音ミク
+      * ↓
+      * 重音テト & 初音ミク
+      *
+      * 全角（）・半角()の両方に対応。
+      *
+      * &などで分割するより前に実施する。
+      */
+      text = text
+        .replace(
+          /（[^）]*）/g,
+          ""
+        )
+        .replace(
+          /\([^)]*\)/g,
+          ""
+        );
+
+      /*
+      * 区切り文字ごとに分割
+      *
+      * 対応:
+      * 、 , ， ／ / 改行 ＆ & ・
+      */
+      return text
         .split(
-          /[、,，／/\n＆&]+/
+          /[、,，／/\n＆&・]+/
         )
-        .map(
-          (item) =>
-            item.trim()
-        )
+        .map((item) => {
+          /*
+          * 絞り込み用の名前から
+          * 音声合成ソフト名・バージョン表記を除去する。
+          *
+          * 例:
+          * 重音テトSV
+          * → 重音テト
+          *
+          * UTAU 重音テト
+          * → 重音テト
+          *
+          * 初音ミク V4X
+          * → 初音ミク
+          *
+          * 初音ミク V6
+          * → 初音ミク
+          */
+          return item
+            .replace(
+              /Synthesizer\s*V/gi,
+              ""
+            )
+            .replace(
+              /UTAU/gi,
+              ""
+            )
+            .replace(
+              /\bV4X\b/gi,
+              ""
+            )
+            .replace(
+              /\bV6\b/gi,
+              ""
+            )
+            .replace(
+              /\bSV\b/gi,
+              ""
+            )
+            .trim();
+        })
         .filter(Boolean);
     }
 
@@ -1042,6 +1110,52 @@
     }
 
     /* =========================================================
+      XアカウントURL正規化
+      ========================================================= */
+
+    function normalizeXUrl(value) {
+      if (!value) {
+        return null;
+      }
+
+      const text =
+        String(value).trim();
+
+      if (!text) {
+        return null;
+      }
+
+      /*
+      * @から始まっている場合は
+      * XのプロフィールURLに変換
+      *
+      * 例:
+      * @GAKKI_D_Neb
+      * ↓
+      * https://x.com/GAKKI_D_Neb
+      */
+      if (text.startsWith("@")) {
+        const accountId =
+          text.slice(1).trim();
+
+        if (!accountId) {
+          return null;
+        }
+
+        return (
+          "https://x.com/" +
+          accountId
+        );
+      }
+
+      /*
+      * URLが書かれている場合は
+      * そのまま使用
+      */
+      return text;
+    }
+
+    /* =========================================================
        リンクボタン
        ========================================================= */
 
@@ -1133,9 +1247,11 @@
       const xLink =
         createLinkButton(
           "X",
-          song[
-            COLUMNS.xUrl
-          ],
+          normalizeXUrl(
+            song[
+              COLUMNS.xUrl
+            ]
+          ),
           "button-x"
         );
 
