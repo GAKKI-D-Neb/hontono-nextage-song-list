@@ -12,6 +12,7 @@
       --line: #eadfca;
       --white: #fffefa;
       --shadow: 0 12px 30px rgba(63, 60, 54, .09);
+      --player-max-width: 560px; /* プレイヤーの最大幅はここで調整 */
     }
 
     * { box-sizing: border-box; }
@@ -208,6 +209,63 @@
       font-weight: 800;
       letter-spacing: .04em;
     }
+
+    .track-main {
+      grid-column: 1 / 5;
+      grid-row: 1;
+      display: grid;
+      grid-template-columns: 44px 52px minmax(0, 2fr) minmax(0, 1fr);
+      align-items: center;
+      column-gap: 12px;
+      width: 100%;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      color: inherit;
+      background: transparent;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      appearance: none;
+    }
+    .track-main:hover:not(:disabled) .track-thumb {
+      opacity: .86;
+      box-shadow: 0 0 0 3px rgba(37, 142, 170, .18);
+    }
+    .track-main:focus-visible {
+      outline: 3px solid var(--blue-deep);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    .track-main:disabled {
+      cursor: default;
+      opacity: .7;
+    }
+    .track-player {
+      padding: 0 15px 14px 71px;
+      background: rgba(255, 254, 250, .96);
+    }
+    .track-player[hidden] { display: none; }
+    .track-player iframe {
+      display: block;
+      width: min(100%, var(--player-max-width));
+      aspect-ratio: 16 / 9;
+      border: 0;
+      border-radius: 6px;
+      background: #171717;
+    }
+    .player-note {
+      margin: 6px 0 0;
+      color: #7c8491;
+      font-size: 10px;
+    }
+    @media (max-width: 640px) {
+      .track-player { padding: 0 9px 12px 43px; }
+    }
+    @media (max-width: 390px) {
+      .track-player { padding-right: 6px; padding-left: 34px; }
+    }
+
     .track-no {
       color: var(--red-dark);
       font-size: 12px;
@@ -321,6 +379,10 @@
         grid-template-columns: 27px 40px minmax(0, 1.45fr) minmax(0, .85fr) 62px;
         column-gap: 7px;
       }
+      .track-main {
+        grid-template-columns: 27px 40px minmax(0, 1.45fr) minmax(0, .85fr);
+        column-gap: 7px;
+      }
       .track-header { padding: 8px 9px; font-size: 9px; }
       .track-link { min-height: 52px; padding: 7px 9px; }
       .track-thumb { width: 38px; height: 38px; }
@@ -334,6 +396,10 @@
       .track-header,
       .track-link {
         grid-template-columns: 23px 34px minmax(0, 1.35fr) minmax(0, .8fr) 52px;
+        column-gap: 5px;
+      }
+      .track-main {
+        grid-template-columns: 23px 34px minmax(0, 1.35fr) minmax(0, .8fr);
         column-gap: 5px;
       }
       .track-header { padding-right: 6px; padding-left: 6px; font-size: 8px; }
