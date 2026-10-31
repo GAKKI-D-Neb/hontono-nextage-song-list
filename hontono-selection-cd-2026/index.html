@@ -68,6 +68,7 @@
         掲載情報に誤りや変更がある場合があります。
       </p>
       <p><a id="project-link" target="_blank" rel="noopener noreferrer">セレクションCD制作プロジェクトはこちら</a></p>
+      <p><a id="festival-link" target="_blank" rel="noopener noreferrer">大阪新世界フェスの公式サイトはこちら</a></p>
     </footer>
   </main>
 
@@ -89,7 +90,10 @@
       creatorUrl: "https://x.com/GAKKI_D_Neb",
 
       // セレクションCD制作プロジェクトの案内ページ
-      projectUrl: "https://camp-fire.jp/projects/916894/view"
+      projectUrl: "https://camp-fire.jp/projects/916894/view",
+
+      // 大阪新世界フェスの公式サイト
+      festivalUrl: "https://shinsekaiofficial.com/1070/"
     };
 
     const spreadsheetId = CONFIG.spreadsheetUrl.match(/\/spreadsheets\/d\/([^/]+)/)?.[1];
@@ -104,6 +108,7 @@
     document.getElementById("mylist-link").href = CONFIG.mylistUrl;
     document.getElementById("creator-link").href = CONFIG.creatorUrl;
     document.getElementById("project-link").href = CONFIG.projectUrl;
+    document.getElementById("festival-link").href = CONFIG.festivalUrl;
 
     const grid = document.getElementById("track-grid");
     const statusBox = document.getElementById("status");
@@ -163,8 +168,21 @@
       number.className = "track-no";
       number.textContent = String(order).padStart(2, "0");
 
+      // 動画IDはシートの「動画ID」列を優先し、URLからも補完する
+      const videoId = clean(track["動画ID"]) ||
+        (videoUrl.match(/\/watch\/([^/?#]+)/)?.[1] ?? "");
+
+      const playButton = document.createElement("button");
+      playButton.type = "button";
+      playButton.className = "track-main";
+      playButton.disabled = !videoId;
+      playButton.setAttribute("aria-expanded", "false");
+      playButton.setAttribute("aria-label", `${title}のプレイヤーを表示`);
+      playButton.title = videoId ? "クリックしてこのページ内で再生" : "動画IDが未登録です";
+
       const thumbnail = document.createElement("span");
       thumbnail.className = "track-thumb";
+
       const thumbnailUrl = safeHttpUrl(track["サムネイルURL"]);
       if (thumbnailUrl) {
         const image = document.createElement("img");
@@ -181,6 +199,57 @@
         thumbnail.classList.add("is-empty");
         thumbnail.textContent = "NO IMAGE";
       }
+
+      const playerPanel = document.createElement("div");
+      playerPanel.className = "track-player";
+      playerPanel.hidden = true;
+      playerPanel.setAttribute("aria-label", `${title}の動画プレイヤー`);
+
+      playButton.addEventListener("click", () => {
+        // 同時に表示するプレイヤーは1つだけにする
+        document.querySelectorAll(".track-player.is-open").forEach(panel => {
+          if (panel !== playerPanel) {
+            panel.replaceChildren();
+            panel.hidden = true;
+            panel.classList.remove("is-open");
+
+            const previousButton = panel.previousElementSibling?.querySelector(".track-main");
+            if (previousButton) {
+              previousButton.setAttribute("aria-expanded", "false");
+              const previousTitle =
+                previousButton.querySelector(".track-title")?.textContent || "この曲";
+              previousButton.setAttribute("aria-label", `${previousTitle}のプレイヤーを表示`);
+            }
+          }
+        });
+
+        if (!playerPanel.hidden) {
+          playerPanel.replaceChildren();
+          playerPanel.hidden = true;
+          playerPanel.classList.remove("is-open");
+          playButton.setAttribute("aria-expanded", "false");
+          playButton.setAttribute("aria-label", `${title}のプレイヤーを表示`);
+          return;
+        }
+
+        const iframe = document.createElement("iframe");
+        iframe.src = `https://embed.nicovideo.jp/watch/${encodeURIComponent(videoId)}`;
+        iframe.title = `${title} - ニコニコ動画プレイヤー`;
+        iframe.loading = "lazy";
+        iframe.allow = "autoplay; encrypted-media; fullscreen; picture-in-picture";
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = "strict-origin-when-cross-origin";
+
+        const playerNote = document.createElement("p");
+        playerNote.className = "player-note";
+        playerNote.textContent = "再生できない場合は、ニコニコ動画で直接ご覧ください。";
+
+        playerPanel.replaceChildren(iframe, playerNote);
+        playerPanel.hidden = false;
+        playerPanel.classList.add("is-open");
+        playButton.setAttribute("aria-expanded", "true");
+        playButton.setAttribute("aria-label", `${title}のプレイヤーを閉じる`);
+      });
 
       const titleNode = document.createElement("span");
       titleNode.className = "track-title";
@@ -209,8 +278,9 @@
 
       const row = document.createElement("div");
       row.className = "track-link";
-      row.append(number, thumbnail, titleNode, authorNode, action);
-      article.appendChild(row);
+      playButton.append(number, thumbnail, titleNode, authorNode);
+      row.append(playButton, action);
+      article.append(row, playerPanel);
       return article;
     }
 
