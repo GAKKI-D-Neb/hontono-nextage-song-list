@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8e8">
+  <meta name="description" content="本当の投稿祭セレクションCD 収録楽曲一覧">
+  <title>本当の投稿祭 セレクションCD｜TRACK LIST</title>
+  <link rel="stylesheet" href="selection_cd_tracklist.css">
+
+</head>
+<body>
+  <main class="page-shell">
+    <header class="hero">
+      <p class="eyebrow">SELECTION CD</p>
+      <h1>本当の投稿祭 セレクションCD</h1>
+      <p class="hero-copy">
+        大阪新世界フェスで頒布予定の「本当のセレクションCD」に収録される楽曲を紹介しています。<br>
+        曲名や作者名から検索して、各楽曲をニコニコ動画でお楽しみいただけます。
+      </p>
+      <p class="hero-links">
+        <a class="hero-link" id="mylist-link" target="_blank" rel="noopener noreferrer">ニコニコ動画のマイリストを見る ↗</a>
+      </p>
+    </header>
+
+    <section class="list-section" aria-labelledby="list-heading">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">MUSIC CATALOG</p>
+          <h2 id="list-heading">収録楽曲一覧</h2>
+        </div>
+        <div class="track-count" id="track-count">読み込み中…</div>
+      </div>
+
+      <div class="toolbar">
+        <label class="search-wrap">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input
+            class="search-input"
+            id="search"
+            type="search"
+            placeholder="曲名・作者名で検索"
+            autocomplete="off"
+            aria-label="曲名・作者名で検索"
+          >
+        </label>
+      </div>
+
+      <div class="track-header" aria-hidden="true">
+        <span>NO.</span>
+        <span>ART</span>
+        <span>曲名</span>
+        <span>作者名</span>
+        <span class="track-link-heading">LINK</span>
+      </div>
+      <div id="status" class="message" role="status" aria-live="polite">
+        <strong>楽曲情報を読み込んでいます</strong>
+        少々お待ちください。
+      </div>
+      <div id="track-grid" class="track-grid"></div>
+    </section>
+
+    <footer class="footer">
+      <p>本当の投稿祭 セレクションCD 収録楽曲一覧</p>
+      <p class="disclaimer">
+        このページは、収録楽曲を探しやすくするために個人（<a id="creator-link" target="_blank" rel="noopener noreferrer">D-Neb GAKKI</a>）が作成した非公式Viewerです。
+        セレクションCD制作プロジェクトおよびイベント主催者が運営・提供する公式ページではありません。
+        掲載情報に誤りや変更がある場合があります。
+      </p>
+      <p><a id="project-link" target="_blank" rel="noopener noreferrer">セレクションCD制作プロジェクトはこちら</a></p>
+    </footer>
+  </main>
+
+  <script>
+    // =========================================================
+    // 設定：リンク先やシート名を変更するときは、ここだけ編集してください
+    // =========================================================
+    const CONFIG = {
+      // データ取得元のGoogleスプレッドシート（共有設定は「リンクを知っている全員：閲覧者」）
+      spreadsheetUrl: "https://docs.google.com/spreadsheets/d/1gadABdlvL1ecKJf1Wtd7cvFWcLODYRzItgUa-niS5as/edit",
+
+      // Googleスプレッドシート下部のシートタブ名
+      sheetName: "シート1",
+
+      // ニコニコ動画のマイリスト
+      mylistUrl: "https://www.nicovideo.jp/user/57897522/mylist/79699409",
+
+      // ページ作成者（D-Neb GAKKI）のXアカウント
+      creatorUrl: "https://x.com/GAKKI_D_Neb",
+
+      // セレクションCD制作プロジェクトの案内ページ
+      projectUrl: "https://camp-fire.jp/projects/916894/view"
+    };
+
+    const spreadsheetId = CONFIG.spreadsheetUrl.match(/\/spreadsheets\/d\/([^/]+)/)?.[1];
+    if (!spreadsheetId) {
+      throw new Error("CONFIG.spreadsheetUrl の形式を確認してください。");
+    }
+
+    const OPENSHEET_URL =
+      `https://opensheet.elk.sh/${spreadsheetId}/${encodeURIComponent(CONFIG.sheetName)}`;
+
+    // ページ内リンクにも、上の設定を反映
+    document.getElementById("mylist-link").href = CONFIG.mylistUrl;
+    document.getElementById("creator-link").href = CONFIG.creatorUrl;
+    document.getElementById("project-link").href = CONFIG.projectUrl;
+
+    const grid = document.getElementById("track-grid");
+    const statusBox = document.getElementById("status");
+    const countBox = document.getElementById("track-count");
+    const searchInput = document.getElementById("search");
+
+    let allTracks = [];
+
+    function clean(value) {
+      return String(value ?? "").trim();
+    }
+
+    function safeHttpUrl(value) {
+      const raw = clean(value);
+      if (!raw) return "";
+      try {
+        const url = new URL(raw);
+        return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+      } catch {
+        return "";
+      }
+    }
+
+    function showMessage(title, detail, showRetry = false) {
+      statusBox.hidden = false;
+      statusBox.replaceChildren();
+
+      const strong = document.createElement("strong");
+      strong.textContent = title;
+      statusBox.appendChild(strong);
+
+      const text = document.createElement("div");
+      text.textContent = detail;
+      statusBox.appendChild(text);
+
+      if (showRetry) {
+        const button = document.createElement("button");
+        button.className = "retry-button";
+        button.type = "button";
+        button.textContent = "再読み込み";
+        button.addEventListener("click", loadTracks);
+        statusBox.appendChild(button);
+      }
+    }
+
+    function makeTrackCard(track, index) {
+      const article = document.createElement("article");
+      article.className = "track-card";
+
+      const videoUrl = safeHttpUrl(track["ニコニコ動画URL"]);
+      const title = clean(track["曲名"]) || clean(track["動画タイトル"]) || "曲名未設定";
+      // 表示・検索には「作者名」列を使用する
+      const author = clean(track["作者名"]);
+      const order = clean(track["順番"]) || String(index + 1);
+
+      const number = document.createElement("span");
+      number.className = "track-no";
+      number.textContent = String(order).padStart(2, "0");
+
+      const thumbnail = document.createElement("span");
+      thumbnail.className = "track-thumb";
+      const thumbnailUrl = safeHttpUrl(track["サムネイルURL"]);
+      if (thumbnailUrl) {
+        const image = document.createElement("img");
+        image.src = thumbnailUrl;
+        image.alt = `${title}のサムネイル`;
+        image.loading = "lazy";
+        image.decoding = "async";
+        image.addEventListener("error", () => {
+          thumbnail.classList.add("is-empty");
+          thumbnail.textContent = "NO IMAGE";
+        }, { once: true });
+        thumbnail.appendChild(image);
+      } else {
+        thumbnail.classList.add("is-empty");
+        thumbnail.textContent = "NO IMAGE";
+      }
+
+      const titleNode = document.createElement("span");
+      titleNode.className = "track-title";
+      titleNode.textContent = title;
+      titleNode.title = title;
+
+      const authorNode = document.createElement("span");
+      authorNode.className = "track-author";
+      authorNode.textContent = author || "—";
+      authorNode.title = author;
+
+      let action;
+      if (videoUrl) {
+        action = document.createElement("a");
+        action.className = "track-action";
+        action.href = videoUrl;
+        action.target = "_blank";
+        action.rel = "noopener noreferrer";
+        action.textContent = "視聴する";
+        action.setAttribute("aria-label", `${title}（${author || "作者名未設定"}）をニコニコ動画で開く`);
+      } else {
+        action = document.createElement("span");
+        action.className = "track-action is-unavailable";
+        action.textContent = "未登録";
+      }
+
+      const row = document.createElement("div");
+      row.className = "track-link";
+      row.append(number, thumbnail, titleNode, authorNode, action);
+      article.appendChild(row);
+      return article;
+    }
+
+    function renderTracks() {
+      const keyword = clean(searchInput.value).toLocaleLowerCase();
+      const filtered = allTracks.filter(track => {
+        const title = clean(track["曲名"]) || clean(track["動画タイトル"]);
+        const author = clean(track["作者名"]);
+        return `${title} ${author}`.toLocaleLowerCase().includes(keyword);
+      });
+
+      grid.replaceChildren();
+      countBox.textContent = `${filtered.length} / ${allTracks.length} TRACKS`;
+
+      if (filtered.length === 0) {
+        showMessage(
+          allTracks.length ? "該当する楽曲がありません" : "楽曲がありません",
+          allTracks.length ? "検索キーワードを変えてみてください。" : "スプレッドシートに楽曲データがありません。"
+        );
+        return;
+      }
+
+      statusBox.hidden = true;
+      const fragment = document.createDocumentFragment();
+      filtered.forEach((track, index) => {
+        fragment.appendChild(makeTrackCard(track, index));
+      });
+      grid.appendChild(fragment);
+    }
+
+    async function loadTracks() {
+      showMessage("楽曲情報を読み込んでいます", "少々お待ちください。");
+      countBox.textContent = "読み込み中…";
+      grid.replaceChildren();
+
+      try {
+        const response = await fetch(OPENSHEET_URL, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const rows = await response.json();
+        if (!Array.isArray(rows)) {
+          throw new Error("スプレッドシートのデータ形式を確認できませんでした。");
+        }
+
+        allTracks = rows
+          .map(row => ({
+            ...row,
+            _order: Number.parseInt(clean(row["順番"]), 10)
+          }))
+          .filter(row => clean(row["曲名"]) || clean(row["動画タイトル"]))
+          .sort((a, b) => {
+            const aOrder = Number.isFinite(a._order) ? a._order : Number.MAX_SAFE_INTEGER;
+            const bOrder = Number.isFinite(b._order) ? b._order : Number.MAX_SAFE_INTEGER;
+            return aOrder - bOrder;
+          });
+
+        if (allTracks.length === 0) {
+          showMessage(
+            "楽曲データを確認できませんでした",
+            "シートの1行目に「曲名」「作者名」「ニコニコ動画URL」などの見出しがあるか確認してください。",
+            true
+          );
+          countBox.textContent = "0 TRACKS";
+          return;
+        }
+
+        renderTracks();
+      } catch (error) {
+        console.error(error);
+        allTracks = [];
+        countBox.textContent = "読み込みエラー";
+        showMessage(
+          "スプレッドシートを読み込めませんでした",
+          "シート名が正しいか、Googleスプレッドシートの共有設定が「リンクを知っている全員：閲覧者」になっているか確認してください。",
+          true
+        );
+      }
+    }
+
+    searchInput.addEventListener("input", renderTracks);
+    loadTracks();
+  </script>
+</body>
+</html>
