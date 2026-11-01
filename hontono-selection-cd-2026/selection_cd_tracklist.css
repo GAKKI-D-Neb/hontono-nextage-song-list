@@ -154,7 +154,7 @@
     .track-header,
     .track-link {
       display: grid;
-      grid-template-columns: 44px 52px minmax(0, 2fr) minmax(0, 1fr) 116px;
+      grid-template-columns: 44px 52px minmax(0, 2fr) minmax(0, 1fr) 142px;
       align-items: center;
       column-gap: 12px;
     }
@@ -279,8 +279,31 @@
       color: var(--navy);
       font-size: 14px;
       font-weight: 850;
-      text-overflow: ellipsis;
       white-space: nowrap;
+    }
+    .track-title-inner {
+      display: inline-block;
+      width: max-content;
+      min-width: 0;
+      white-space: nowrap;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .track-title.is-overflowing:hover .track-title-inner {
+        animation: track-title-marquee var(--marquee-duration, 5s) linear forwards;
+      }
+    }
+    .track-title.is-revealed .track-title-inner {
+      animation: track-title-marquee var(--marquee-duration, 5s) linear forwards;
+    }
+    @keyframes track-title-marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(calc(-1 * var(--marquee-distance, 0px))); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .track-title.is-overflowing:hover .track-title-inner,
+      .track-title.is-revealed .track-title-inner {
+        animation: none;
+      }
     }
     .track-author {
       min-width: 0;
@@ -324,6 +347,32 @@
       cursor: default;
     }
     .track-action.is-unavailable::after { content: ""; }
+
+    .track-actions {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      min-width: 0;
+    }
+    .track-actions .track-action {
+      justify-self: auto;
+      min-width: 80px;
+      padding: 6px 7px;
+    }
+    .track-actions .track-x-action {
+      min-width: 34px;
+      width: 34px;
+      padding: 6px 0;
+      border-color: var(--navy);
+      color: var(--navy);
+    }
+    .track-actions .track-x-action:hover {
+      color: white;
+      background: var(--navy);
+    }
+
 
     .message {
       padding: 28px 20px;
@@ -376,7 +425,7 @@
       .section-heading { align-items: center; }
       .track-header,
       .track-link {
-        grid-template-columns: 27px 40px minmax(0, 1.45fr) minmax(0, .85fr) 62px;
+        grid-template-columns: 27px 40px minmax(0, 1.45fr) minmax(0, .85fr) 112px;
         column-gap: 7px;
       }
       .track-main {
@@ -389,13 +438,16 @@
       .track-title { font-size: 12px; }
       .track-author { font-size: 10px; }
       .track-action { min-width: 58px; padding: 5px 6px; font-size: 10px; }
+      .track-actions { gap: 4px; }
+      .track-actions .track-action { min-width: 68px; padding: 5px 5px; }
+      .track-actions .track-x-action { min-width: 30px; width: 30px; padding: 5px 0; }
       .track-action::after { margin-left: 1px; }
     }
     @media (max-width: 390px) {
       .section-heading { align-items: start; flex-direction: column; gap: 10px; }
       .track-header,
       .track-link {
-        grid-template-columns: 23px 34px minmax(0, 1.35fr) minmax(0, .8fr) 52px;
+        grid-template-columns: 23px 34px minmax(0, 1.35fr) minmax(0, .8fr) 104px;
         column-gap: 5px;
       }
       .track-main {
@@ -408,4 +460,7 @@
       .track-title { font-size: 11px; }
       .track-author { font-size: 9px; }
       .track-action { min-width: 50px; padding: 4px 4px; font-size: 9px; }
+      .track-actions { gap: 3px; }
+      .track-actions .track-action { min-width: 62px; padding: 4px 3px; }
+      .track-actions .track-x-action { min-width: 27px; width: 27px; padding: 4px 0; }
     }
