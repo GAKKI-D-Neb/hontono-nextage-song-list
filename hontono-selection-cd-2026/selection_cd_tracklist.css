@@ -322,7 +322,7 @@
       min-width: 104px;
       padding: 6px 10px;
       border: 1px solid var(--blue-deep);
-      border-radius: 999px;
+      border-radius: 10px;
       color: var(--blue-deep);
       background: var(--white);
       font-size: 11px;
