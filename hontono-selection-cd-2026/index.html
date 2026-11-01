@@ -117,6 +117,28 @@
 
     let allTracks = [];
 
+    // 曲名が表示幅を超えているかを、レイアウト確定後に判定する
+    const titleResizeObserver = new ResizeObserver(entries => {
+      entries.forEach(({ target }) => {
+        const inner = target.querySelector(".track-title-inner");
+        if (!inner) return;
+
+        const overflow = inner.scrollWidth - target.clientWidth;
+        if (overflow > 1) {
+          target.classList.add("is-overflowing");
+          target.style.setProperty("--marquee-distance", `${overflow}px`);
+          target.style.setProperty(
+            "--marquee-duration",
+            `${Math.max(3.5, overflow / 24)}s`
+          );
+        } else {
+          target.classList.remove("is-overflowing", "is-revealed");
+          target.style.removeProperty("--marquee-distance");
+          target.style.removeProperty("--marquee-duration");
+        }
+      });
+    });
+
     function clean(value) {
       return String(value ?? "").trim();
     }
@@ -253,33 +275,69 @@
 
       const titleNode = document.createElement("span");
       titleNode.className = "track-title";
-      titleNode.textContent = title;
       titleNode.title = title;
+
+      const titleInner = document.createElement("span");
+      titleInner.className = "track-title-inner";
+      titleInner.textContent = title;
+      titleNode.appendChild(titleInner);
+
+      // タッチ端末では、長い曲名をタップするとスクロール表示を切り替える。
+      // イベント伝播は止めず、親の .track-main によるプレイヤー開閉も実行する。
+      titleNode.addEventListener("click", () => {
+        if (
+          titleNode.classList.contains("is-overflowing") &&
+          window.matchMedia("(hover: none)").matches
+        ) {
+          titleNode.classList.toggle("is-revealed");
+        }
+      });
+
+      titleResizeObserver.observe(titleNode);
 
       const authorNode = document.createElement("span");
       authorNode.className = "track-author";
       authorNode.textContent = author || "—";
       authorNode.title = author;
 
-      let action;
+      // 動画リンクと作者のXアカウントリンクをまとめる
+      const actions = document.createElement("div");
+      actions.className = "track-actions";
+
       if (videoUrl) {
-        action = document.createElement("a");
-        action.className = "track-action";
-        action.href = videoUrl;
-        action.target = "_blank";
-        action.rel = "noopener noreferrer";
-        action.textContent = "視聴する";
-        action.setAttribute("aria-label", `${title}（${author || "作者名未設定"}）をニコニコ動画で開く`);
+        const videoAction = document.createElement("a");
+        videoAction.className = "track-action";
+        videoAction.href = videoUrl;
+        videoAction.target = "_blank";
+        videoAction.rel = "noopener noreferrer";
+        videoAction.textContent = "視聴する";
+        videoAction.setAttribute("aria-label", `${title}（${author || "作者名未設定"}）をニコニコ動画で開く`);
+        actions.appendChild(videoAction);
       } else {
-        action = document.createElement("span");
-        action.className = "track-action is-unavailable";
-        action.textContent = "未登録";
+        const unavailable = document.createElement("span");
+        unavailable.className = "track-action is-unavailable";
+        unavailable.textContent = "未登録";
+        actions.appendChild(unavailable);
+      }
+
+      // 「XアカウントURL」が空欄の場合は、Xボタン自体を追加しない
+      const xAccountUrl = safeHttpUrl(track["XアカウントURL"]);
+      if (xAccountUrl) {
+        const xAction = document.createElement("a");
+        xAction.className = "track-action track-x-action";
+        xAction.href = xAccountUrl;
+        xAction.target = "_blank";
+        xAction.rel = "noopener noreferrer";
+        xAction.textContent = "X";
+        xAction.setAttribute("aria-label", `${author || title}のXアカウントを開く`);
+        xAction.title = `${author || title}のXアカウントを開く`;
+        actions.appendChild(xAction);
       }
 
       const row = document.createElement("div");
       row.className = "track-link";
       playButton.append(number, thumbnail, titleNode, authorNode);
-      row.append(playButton, action);
+      row.append(playButton, actions);
       article.append(row, playerPanel);
       return article;
     }
@@ -292,6 +350,9 @@
         return `${title} ${author}`.toLocaleLowerCase().includes(keyword);
       });
 
+      grid.querySelectorAll(".track-title").forEach(titleNode => {
+        titleResizeObserver.unobserve(titleNode);
+      });
       grid.replaceChildren();
       countBox.textContent = `${filtered.length} / ${allTracks.length} TRACKS`;
 
